@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thời khóa biểu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Dòng timeline chính */
+        .timeline {
+            position: relative;
+            margin: 50px 0;
+        }
+        .timeline::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background-color: #007bff;
+            transform: translateX(-50%);
+        }
+        /* Dấu chấm trên timeline */
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border: 4px solid #007bff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        /* Nội dung timeline */
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            position: relative;
+            width: 45%;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .timeline-content.left {
+            left: 0;
+        }
+        .timeline-content.right {
+            left: 55%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Banner Hero -->
+    <header class="bg-primary text-white text-center py-5 position-relative"
+        style="background: url('banner.jpg') center/cover no-repeat;">
+        <div class="overlay position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0, 0, 0, 0.5);"></div>
+        <div class="container position-relative">
+            <h1 class="fw-bold">Chào mừng đến với CÔ ĐIỆP DẠY TIN HỌC</h1>
+            <p class="lead">Cung cấp khóa học Tin học chất lượng cao cho học sinh THPT</p>
+            <div class="d-flex justify-content-center gap-3 mt-3">
+                <a href="about.html" class="btn btn-light btn-lg">Giới thiệu bản thân</a>
+                <a href="index.html" class="btn btn-light btn-lg">Khám phá khóa học</a>
+                <a href="schedule.html" class="btn btn-outline-light btn-lg">Xem thời khóa biểu</a>
+                <a href="contact.html" class="btn btn-light btn-lg ms-2">Gửi tin nhắn</a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container my-5">
+        <h2 class="text-center text-primary">Xem Thời Khóa Biểu</h2>
+    
+        <!-- Chọn lớp -->
+        <div class="mb-3">
+            <label for="classSelect" class="form-label">Chọn lớp học:</label>
+            <select id="classSelect" class="form-select">
+                <option value="10" selected>Tin K10</option>
+                <option value="11">Tin K11</option>
+                <option value="12">Tin K12</option>
+                <option value="mos-word">MOS Word</option>
+                <option value="mos-excel">MOS Excel</option>
+                <option value="mos-powerpoint">MOS PowerPoint</option>
+            </select>
+        </div>
+    
+        <!-- Timeline -->
+        <div class="timeline" id="scheduleTimeline">
+            <p class="text-center text-muted">Vui lòng chọn lớp để xem thời khóa biểu.</p>
+        </div>
+    </div>
+    
+    <script>
+    // Dữ liệu thời khóa biểu
+    const scheduleData = {
+        "10": [
+            { date: "15-02-2025", time: "08:00 - 09:30", topic: "Nhập môn Tin học", content: "Giới thiệu về tin học, máy tính và hệ điều hành." },
+            { date: "17-02-2025", time: "10:00 - 11:30", topic: "Microsoft Word cơ bản", content: "Cách soạn thảo văn bản, định dạng, chèn hình ảnh." }
+        ],
+        "11": [
+            { date: "16-02-2025", time: "09:00 - 10:30", topic: "Lập trình Python cơ bản", content: "Biến, kiểu dữ liệu và vòng lặp." },
+            { date: "18-02-2025", time: "14:00 - 15:30", topic: "Cấu trúc dữ liệu", content: "Danh sách, tuple, dictionary trong Python." }
+        ],
+        "12": [
+            { date: "20-02-2025", time: "08:00 - 09:30", topic: "Lập trình hướng đối tượng", content: "Giới thiệu về OOP, class và object trong Java." },
+            { date: "22-02-2025", time: "16:00 - 17:30", topic: "Giải thuật sắp xếp", content: "Bubble sort, quick sort." }
+        ]
+    };
+    
+    // Xử lý khi người dùng chọn lớp
+    document.getElementById("classSelect").addEventListener("change", function() {
+        const selectedClass = this.value;
+        const scheduleTimeline = document.getElementById("scheduleTimeline");
+    
+        // Xóa dữ liệu cũ
+        scheduleTimeline.innerHTML = "";
+    
+        // Nếu lớp không có dữ liệu
+        if (!scheduleData[selectedClass] || scheduleData[selectedClass].length === 0) {
+            scheduleTimeline.innerHTML = `<p class="text-center text-muted">Không có thời khóa biểu cho lớp này.</p>`;
+            return;
+        }
+    
+        // Tạo timeline mới
+        let timelineHTML = "";
+        scheduleData[selectedClass].forEach((entry, index) => {
+            const position = index % 2 === 0 ? "left" : "right";
+            timelineHTML += `
+                <div class="timeline-item">
+                    <div class="timeline-content ${position}">
+                        <h5 class="mb-0 text-primary">${entry.topic}</h5>
+                        <p class="mb-0">${entry.content}</p>
+                        <small class="text-muted">${entry.date} | ${entry.time}</small>
+                    </div>
+                </div>
+            `;
+        });
+    
+        scheduleTimeline.innerHTML = timelineHTML;
+    });
+
+    // Gọi sự kiện `change` ngay khi trang tải
+    window.onload = function() {
+        document.getElementById("classSelect").dispatchEvent(new Event("change"));
+    };
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>CÔ ĐIỆP DẠY TIN HỌC</h5>
+                    <p class="mb-1">Trường THPT Ten Lơ Man</p>
+                    <p class="mb-1">Địa chỉ: 8 Đ. Trần Hưng Đạo, Phường Phạm Ngũ Lão, Quận 1, Hồ Chí Minh</p>
+                    <p>Email: ngocdiep.hht@example.com</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Kết nối với chúng tôi</h5>
+                    <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-youtube"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
